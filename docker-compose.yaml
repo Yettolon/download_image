@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis
+    restart: always
+
+  app:
+    restart: always
+    build: 
+      context: ./app
+    ports:
+      - "8000:8000"
+    command: [ "python3", "./app/manage.py", "runserver", "0.0.0.0:8000"]
+  
+  worker:
+    restart: always
+    build: 
+      context: ./app
+    volumes: 
+      - ./cats:/app/app/cats
+    command: ['celery', '--workdir=./app', '-A', 'app', 'worker' ]
